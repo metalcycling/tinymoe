@@ -3,8 +3,6 @@
 from dataclasses import dataclass
 from dataclasses_json import dataclass_json
 
-from argparse import ArgumentParser
-
 # %% Classes
 
 @dataclass_json

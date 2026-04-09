@@ -35,21 +35,23 @@ def main(config: Args) -> None:
 # %% Main program
 
 if __name__ == "__main__":
-    # %% Command line arguments
+    # Model arguments
 
-    parser = ArgumentParser(description="TinyMoE trainer")
-    parser.add_argument("-d", "--dim", type=int, default=128, help="Dimension of the embedding")
-    parser.add_argument("-b", "--batch-size", type=int, default=8, help="Batch size for the trainer")
-    parser.add_argument("-n", "--num-epochs", type=int, default=10, help="Number of epochs to train")
-    parser.add_argument("-lr", "--lr", type=float, default=1.0e-04, help="Learning rate for the trainer")
+    from src.infra import _parser as infra_parser
 
-    args = parser.parse_args()
+    model_parser = ArgumentParser(description="TinyMoE trainer", parents=[infra_parser])
+    model_parser.add_argument("-d", "--dim", type=int, default=128, help="Dimension of the embedding")
+    model_parser.add_argument("-b", "--batch-size", type=int, default=8, help="Batch size for the trainer")
+    model_parser.add_argument("-n", "--num-epochs", type=int, default=10, help="Number of epochs to train")
+    model_parser.add_argument("-lr", "--lr", type=float, default=1.0e-04, help="Learning rate for the trainer")
 
-    # %% Convert arguments to JSON
+    model_args, _ = model_parser.parse_known_args()
 
-    config = json.dumps(vars(args))
+    # Convert model arguments to JSON
 
-    # %% Run pyflyte
+    config = json.dumps(vars(model_args))
+
+    # Run pyflyte
 
     execution_id = f"tinymoe-{str(uuid.uuid4())[:4]}"
 
@@ -67,7 +69,5 @@ if __name__ == "__main__":
     ]
 
     subprocess.run(cmd)
-
-    #main(args)
 
 # %% End of script
