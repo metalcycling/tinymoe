@@ -12,6 +12,7 @@ from flytekitplugins.kfpytorch import (
 )
 from kubernetes.client.models import (
     V1Container,
+    V1EnvVar,
     V1PodSpec,
     V1ResourceRequirements,
 )
@@ -71,6 +72,27 @@ resources = {
     "memory": memory_per_pod,
 }
 
+# %% Set environment variables
+
+env = [
+    V1EnvVar(
+        name="WANDB_API_KEY",
+        value=os.environ.get("WANDB_API_KEY", ""),
+    ),
+    V1EnvVar(
+        name="MINIO_ENDPOINT",
+        value="http://minio.flyte.svc.cluster.local:9000",
+    ),
+    V1EnvVar(
+        name="MINIO_ROOT_USER",
+        value="admin",
+    ),
+    V1EnvVar(
+        name="MINIO_ROOT_PASSWORD",
+        value="password",
+    ),
+]
+
 # %% Set pod template
 
 pod_template = PodTemplate(
@@ -79,7 +101,8 @@ pod_template = PodTemplate(
         containers=[
             V1Container(
                 name="primary",
-                image_pull_policy="IfNotPresent",
+                image_pull_policy="Always",
+                env=env,
                 resources=V1ResourceRequirements(
                     requests=resources,
                     limits=resources,

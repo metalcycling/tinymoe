@@ -12,5 +12,7 @@ class Args:
     batch_size: int
     num_epochs: int
     lr: float
+    num_samples: int = 2000
+    threshold: float = 0.5
 
 # %% End of script
