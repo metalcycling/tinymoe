@@ -17,7 +17,7 @@ class PolynomialMoE(nn.Module):
     def __init__(self, dim, num_experts=4):
         super().__init__()
         assert dim == 2, f"PolynomialMoE expects dim=2 (2D points), got {dim}"
-        self.router = nn.Linear(dim, num_experts)
+        self.router = nn.Sequential(nn.Linear(dim, 64), nn.ReLU(), nn.Linear(64, 64), nn.ReLU(), nn.Linear(64, num_experts))
         self.experts = nn.ModuleList([PolynomialExpert(dim) for _ in range(num_experts)])
 
     def forward(self, x):
