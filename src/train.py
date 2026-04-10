@@ -105,6 +105,8 @@ def train(config: Args) -> None:
             "num_samples": config.num_samples,
             "threshold": config.threshold,
         })
+        wandb.define_metric("epoch")
+        wandb.define_metric("*", step_metric="epoch")
 
     model = PolynomialMoE(dim=config.dim).to("cpu")
     optimizer = torch.optim.AdamW(model.parameters(), lr=config.lr)
@@ -153,10 +155,13 @@ def train(config: Args) -> None:
                 "total_loss": avg_expert_loss + avg_router_loss,
             })
             print(f"Epoch {epoch}: expert_loss={avg_expert_loss:.4f} router_loss={avg_router_loss:.4f}")
-            _save_checkpoint(model, optimizer, epoch)
+
+            if epoch % 100 == 0:
+                _save_checkpoint(model, optimizer, epoch)
 
     if rank == 0:
         wandb.finish()
+        _save_checkpoint(model, optimizer, epoch)
 
     destroy_process_group()
 
